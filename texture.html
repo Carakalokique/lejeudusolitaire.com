@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <button onclick="createTexture()">Create</button>
+</body>
+<script>
+    /*
+    *  Sprite sheet creator. Needs some modifications for file names / path to work correctly
+    */
+
+    let card_w, card_h
+    function loadImages()
+    {
+        const imgs = []
+        for(let i = 0; i < 4; ++i)
+        {
+            const symbol = ['diamonds', 'hearts', 'clubs', 'spades'][i]
+            imgs[i] = []
+            for(let j = 0; j < 13; ++j)
+            {
+                const name = ['ace', '02', '03', '04', '05', '06', '07', '08', '09', '10', 'jack', 'queen', 'king'][j]
+                imgs[i][j] = new Image()
+                //imgs[i][j].src = `./Mobile/individuals/${symbol}/${j + 1}_${symbol}.png`
+                imgs[i][j].src = `./Desktop/${symbol}_${name}.png`
+
+            }
+        }
+        imgs[0][0].onload = () => {
+            card_w = imgs[0][0].width
+            card_h = imgs[0][0].height
+        }
+
+        return imgs
+    }
+    function createTexture()
+    {
+        const w = card_w
+        const h = card_h
+        const canvas = document.createElement('canvas')
+        canvas.height = h * 4
+        canvas.width = w * 13
+        const ctx = canvas.getContext('2d')
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+        for(let i = 0; i < 4; ++i) for(let j = 0; j < 13; ++j)
+        {
+            ctx.drawImage(imgs[i][j], j * w, i * h)
+        }
+        document.body.append(canvas)
+    }
+    const imgs = loadImages()
+</script>
+</html>

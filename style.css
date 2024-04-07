@@ -1,0 +1,253 @@
+html, body
+{
+    padding: 0;
+    margin: 0;
+    user-select: none;
+}
+body
+{
+    background-image: url(./assets/bg_tile.jpg);
+    overscroll-behavior-y: none;
+    overflow-x: hidden;
+}
+.ui
+{
+    width: 100%;
+    background: rgba(0, 0, 0, 0.46);
+    backdrop-filter: blur(2px);
+    box-sizing: border-box;
+
+
+}
+.ui .ui-container
+{
+    width: min(900px, 100vw);
+    position: relative;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+.ui .data
+{
+    display: inline-block;
+    font-weight: bold;
+    color: white;
+}
+.ui button
+{
+    border: none;
+    outline: none;
+    color: #245324;
+    background: white;
+    border-radius: 5px;
+    box-sizing: border-box;
+    padding: 10px 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+#game-over-canvas
+{
+    position: absolute;
+    z-index: 99999;
+    width: 100%;
+    cursor: pointer;
+}
+.game-area
+{
+    position: relative;
+    --game-width: min(900px, 100vw);
+    --card-size: calc(var(--game-width) / 8);
+    margin: 0 auto;
+    width: var(--game-width);
+    /* min-height: calc(var(--game-width) * .6); */
+    min-height: 100vh;
+}
+.card, .card-container, .card-container:before
+{
+    aspect-ratio: 352 / 512;
+    width: var(--card-size);
+}
+
+.card-container
+{
+    position: absolute;
+    border-radius: calc(var(--card-size) / 10);
+}
+
+.card-container:before
+{
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.34);
+    z-index: -1;
+    border-radius: 10px;
+}
+
+
+.card-container.type-1 .card
+{
+    position: absolute;
+    top: 0;
+}
+
+.card-container.type-2 .card
+{
+    margin-bottom: calc(var(--card-size) * -1.15);
+}
+.card-container.type-2 .card.hidden
+{
+    margin-bottom: calc(var(--card-size) * -1.35);
+}
+
+.card-container.type-2 .card:last-of-type
+{
+    margin-bottom: var(--card-size);
+}
+
+.card-container.type-3 .card
+{
+    position: absolute;
+    display: none;
+    --distance: .4;
+    transition: left 200ms;
+}
+
+.card-container.type-3 .card:nth-last-child(3)
+{
+    left: 0;
+    display: block;
+}
+.card-container.type-3 .card:nth-last-child(2)
+{
+    left: calc(var(--card-size) * var(--distance));
+    display: block;
+}
+.card-container.type-3 .card:nth-last-child(1)
+{
+    left: calc(var(--card-size) * var(--distance) * 2);
+    display: block;
+}
+
+.card
+{
+    background-image: url(./assets/mobile/allcards.png);
+    background-size: 1300% 400%;
+    border-radius: calc(var(--card-size) / 10);
+}
+.card.placeholder
+{
+    background: rgba(0, 0, 0, 0.16);
+}
+.card.hidden
+{
+    background-image: url(./assets/mobile/back.png);
+    background-size: 100% 100%;
+}
+.card.drag
+{
+    pointer-events: none;
+    touch-action: none;
+    user-select: none;
+}
+.card.flip
+{
+    animation: cardflip 300ms 2 alternate;
+}
+@keyframes cardflip {
+    0%
+    {
+        transform: rotateY(0);
+    }
+    100%
+    {
+        transform: rotateY(90deg);
+    }
+}
+
+#timer-desktop, #moves
+{
+    display: none;
+}
+@media screen and (min-width: 700px)
+{
+    .card
+    {
+        background-image: url(./assets/desktop/allcards.png);
+    }
+    .card.hidden {
+        background-image: url(./assets/desktop/back.png);
+    }
+    .card-container.type-3 .card
+    {
+        --distance: .25;
+    }
+    #timer-mobile
+    {
+        display: none;
+    }
+    #timer-desktop
+    {
+        display: inline-block;
+    }
+    #moves
+    {
+        display: inline-block;
+    }
+}
+
+/* Paula's CSS */
+
+.main {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    padding: 5rem 10rem;
+    align-items: center;
+}
+
+.image {
+    /* put in image css here */
+}
+
+h1 { 
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0;
+    padding: 1rem 0 1rem;
+    /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
+}
+
+h2 { 
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 2.125rem;
+    font-weight: 700;
+    margin: 0;
+    padding: 1rem 0 1rem;
+    /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
+}
+
+h3 { 
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.875rem;
+    font-weight: 500;
+    margin: 0;
+    padding: 1rem 0 1rem;
+    /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
+}
+
+p { 
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin: 0;
+    padding: 1rem 0 1rem;
+    /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
+}
+
+
