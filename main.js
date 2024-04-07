@@ -248,6 +248,7 @@ function setupGameOverAnimation()
     let cardAmount = 0
     function createCard()
     {
+        // TODO Check Math Random for Animation Issue
         const number = ~~(Math.random() * 13)
         const sign = ~~(Math.random() * 4)
         let ay = 0
