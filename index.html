@@ -1,43 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Solitaire</title>
-    <link rel="stylesheet" href="./style.css?v13">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=device-width, user-scalable=no">
-</head>
-<body>
+    <link rel="stylesheet" href="./style.css?v13" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+  </head>
+  <body>
     <div class="ui">
-        <div class="ui-container">
-            <button onclick="restartGame()">Restart</button>
-            <div class="data" id="timer-desktop">Time: 0:00</div>
-            <div class="data" id="timer-mobile">0:00</div>
-            <!--
+      <div class="ui-container">
+        <button onclick="restartGame()">Nouvelle partie</button>
+        <div class="data" id="timer-desktop">Time: 0:00</div>
+        <div class="data" id="timer-mobile">0:00</div>
+        <!--
             <div class="data" id="points-desktop">Points: 0</div>
             <div class="data" id="points-mobile">Points: 0</div>
             <div class="data" id="moves">Moves: 0</div>
             -->
-            <div>
-            <!--<button onclick="fullAutoplayStep()">Autoplay</button>-->
-            <button onclick="undo()">Undo</button>
-            </div>
+        <div>
+          <!--<button onclick="fullAutoplayStep()">Autoplay</button>-->
+          <button onclick="undo()">Annuler</button>
         </div>
+      </div>
     </div>
     <div class="game-area" id="game-area">
-        <canvas id="game-over-canvas"></canvas>
+      <canvas id="game-over-canvas"></canvas>
     </div>
 
     <!-- Paula's Code starts here -- change what is needed here and in style.css sheet -->
-    
+
     <main class="main">
-        <h1>This is an h1 title</h1>
-        <h2>This is an h2 subtitle</h2>
-        <h3>This is an h3 subtitle</h3>
-        <p>This is a paragraph</p>
-        <img src="https://www.play-solitaire.com/img/how-to-play-solitaire-tableau-cards.png" class="image">
+      <h1>This is an h1 title</h1>
+      <h2>This is an h2 subtitle</h2>
+      <h3>This is an h3 subtitle</h3>
+      <p>This is a paragraph</p>
+      <img
+        src="https://www.play-solitaire.com/img/how-to-play-solitaire-tableau-cards.png"
+        class="image"
+      />
     </main>
-</body>
-<script src="classes.js?v13"></script>
-<script src="main.js?v14"></script>
+  </body>
+  <script src="classes.js?v13"></script>
+  <script src="main.js?v14"></script>
 </html>
