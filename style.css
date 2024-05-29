@@ -196,7 +196,6 @@ footer .container a:hover {
 }
 
 .image {
-<<<<<<< HEAD
   /* put in image css here */
 }
 
@@ -236,98 +235,3 @@ p {
   padding: 1rem 0 1rem;
   /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
 }
-=======
-    width: 100%;
-    /* put in image css here */
-}
-
-h1 { 
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 2.5rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    margin: 0;
-    padding: 1rem 0 1rem;
-    text-align: center;
-
-    /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
-}
-
-h2 { 
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 2.125rem;
-    font-weight: 700;
-    margin: 0;
-    padding: 1rem 0 1rem;
-    text-align: center;
-
-    /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
-}
-
-h3 { 
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.875rem;
-    font-weight: 500;
-    margin: 0;
-    padding: 1rem 0 1rem;
-    text-align: center;
-
-    /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
-}
-
-p { 
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.5rem;
-    font-weight: 300;
-    margin: 0;
-    padding: 1rem 0 1rem;
-    text-align: center;
-
-    /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
-}
-
-/* Mobile-Fonts */
-
-@media screen and (max-width: 768px) {
-    .main {
-        background-color: white;
-        display: flex;
-        flex-direction: column;
-        margin: 0 auto;
-        padding: 5rem 5rem;
-    }
-
-    h1 {
-      font-size: 1.5rem;
-      line-height: 2rem;
-      font-weight: 900;
-      text-align: center;
-    }
-  
-    h2 {
-      font-size: 0.75rem;
-      line-height: 1.25rem;
-      font-weight: 700;
-      text-align: center;
-
-    }
-  
-    h3 {
-      font-size: 0.8125rem;
-      line-height: 1.125rem;
-      font-weight: 500;
-      text-align: center;
-
-    }
-  
-    p {
-      font-size: 0.8125rem;
-      line-height: 1.125rem;
-      font-weight: 300;
-      text-align: center;
-
-    }
-  }
-  
-
->>>>>>> 872779c4fdb898518295450206599d7a4b4c443e
