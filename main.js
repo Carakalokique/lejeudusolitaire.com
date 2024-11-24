@@ -467,3 +467,32 @@ modal.addEventListener('click', (e) => {
     hideModal();
   }
 });
+
+function testGameOver() {
+    // Create a game over state by moving all cards to foundations
+    const cards = [];
+    
+    // Collect all cards from tableau, waste, and stock
+    [...conts.tableau, conts.waste, conts.stock].forEach(container => {
+        while (container.cards.length > 0) {
+            const card = container.cards.pop();
+            card.reveal();
+            cards.push(card);
+        }
+    });
+
+    // Sort cards by suit and rank
+    cards.sort((a, b) => {
+        if (a.sign !== b.sign) return a.sign - b.sign;
+        return a.number - b.number;
+    });
+
+    // Distribute to foundation piles
+    cards.forEach((card, i) => {
+        const foundationIndex = Math.floor(i / 13);
+        card.moveToContainer(conts.foundation[foundationIndex]);
+    });
+
+    // Trigger the win animation
+    gameOverAnimation();
+}
