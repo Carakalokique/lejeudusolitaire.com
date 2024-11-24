@@ -1,4 +1,9 @@
 const amountToPull = 3;
+let autoplayEnabled = false;
+const modal = document.getElementById('game-modal');
+const returnText = document.getElementById('return-text');
+const winnableGameBtn = document.getElementById('winnable-game');
+const randomGameBtn = document.getElementById('random-game');
 
 function createCards() {
   let cards = [];
@@ -175,30 +180,32 @@ function timer() {
   document.getElementById("timer-mobile").innerHTML = timeStr;
 }
 function restartGame(bypass = false) {
-  if (
-    !(
-      bypass ||
-      confirm("Êtes-vous sûr de vouloir commencer une nouvelle partie ?")
-    )
-  )
+  if (!bypass) {
+    showModal(true);
     return;
+  }
 
   steps.length = 0;
+  autoplayEnabled = false;
   distributeCards();
   timeElapsed = 0;
   gameFinished = false;
   gameOverAnim.stop();
 
   if (!timerInterval) timerInterval = setInterval(timer, 1000);
+  hideModal();
 }
 
 let gameFinished = false;
 function gameOverAnimation() {
   gameFinished = true;
   gameOverAnim.start();
-
   clearInterval(timerInterval);
   timerInterval = undefined;
+  
+  setTimeout(() => {
+    showModal(false);
+  }, 2000);
 }
 
 function setupGameOverAnimation() {
@@ -372,6 +379,17 @@ function fullAutoplayStep() {
 }
 
 async function autoplay(movedCard) {
+  if (!autoplayEnabled && movedCard) {
+    // Only enable autoplay if a card was manually moved to foundation
+    const isFirstFoundationMove = movedCard.container && 
+                                movedCard.container.type === CardContainer.TYPE.FOUNDATION;
+    if (isFirstFoundationMove) {
+      autoplayEnabled = true;
+    }
+  }
+
+  if (!autoplayEnabled) return;
+
   for (let i = 0; i < 4; ++i)
     await autoplayStep(conts.foundation[i], movedCard);
 }
@@ -403,7 +421,7 @@ async function autoplayStep(goal, movedCard) {
   checkForWin();
 
   if (positiveOutcome) {
-    await delay(500);
+    await delay(700);
     autoplayStep(goal);
   }
 }
@@ -424,3 +442,27 @@ restartGame(true);
 document.getElementById("game-over-canvas").onclick = () => restartGame(true);
 conts.stock.node.addEventListener("click", clickStock);
 //conts.stock.node.addEventListener('touchstart', clickStock)
+
+returnText.addEventListener('click', hideModal);
+randomGameBtn.addEventListener('click', () => restartGame(true));
+winnableGameBtn.addEventListener('click', () => {
+  console.log('Winnable game to be implemented');
+  restartGame(true);
+});
+
+function showModal(showReturn = true) {
+  modal.style.display = 'block';
+  returnText.style.display = showReturn ? 'block' : 'none';
+}
+
+function hideModal() {
+  modal.style.display = 'none';
+}
+
+// Add click event listener to modal container
+modal.addEventListener('click', (e) => {
+  // Check if click is directly on the modal container (outside modal content)
+  if (e.target === modal) {
+    hideModal();
+  }
+});

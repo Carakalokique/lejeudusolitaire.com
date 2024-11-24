@@ -183,7 +183,6 @@ class Card
     }
     moveToContainer(container, needsAnim = false)
     {
-        //Maybe move this to the CardContainer so I can move the cards at the same time, and use the same animation
         let oldPos = null
         if(this.container)
         {

@@ -235,3 +235,83 @@ p {
   padding: 1rem 0 1rem;
   /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
 }
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100000;
+}
+
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 300px;
+}
+
+.modal-question {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.2rem;
+  color: #245324;
+  margin: 0 0 20px 0;
+}
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.modal-buttons button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 5px;
+  background-color: #245324;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  width: 100%;
+}
+
+.modal-buttons button:hover {
+  background-color: #1a3d1a;
+}
+
+.modal-footer {
+  margin-top: 20px;
+  width: 100%;
+  text-align: center;
+}
+
+.return-link {
+  color: #666;
+  cursor: pointer;
+}
+
+@media screen and (min-width: 700px) {
+  .modal-content {
+    min-width: 400px;
+  }
+  
+  .modal-buttons {
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .modal-buttons button {
+    min-width: 180px;
+  }
+}
