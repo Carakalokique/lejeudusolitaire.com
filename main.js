@@ -4,16 +4,10 @@ const modal = document.getElementById('game-modal');
 const returnText = document.getElementById('return-text');
 const winnableGameBtn = document.getElementById('winnable-game');
 const randomGameBtn = document.getElementById('random-game');
+const generator = new SolitaireGenerator();
 
-function createCards() {
-  let cards = [];
-  for (let i = 0; i < 4; ++i)
-    for (let j = 0; j < 13; ++j) {
-      cards.push(new Card(i, j));
-    }
-  shuffleArray(cards);
-  shuffleArray(cards);
-  return cards;
+function createCards(winnable = true) {
+  return generator.generateGame(winnable);
 }
 
 function shuffleArray(array) {
@@ -66,8 +60,8 @@ function createConts() {
 
   distributeCards();
 }
-function distributeCards() {
-  const cards = createCards();
+function distributeCards(winnable = true) {
+  const cards = createCards(winnable);
 
   conts.stock.reset();
   conts.waste.reset();
@@ -187,7 +181,7 @@ function restartGame(bypass = false) {
 
   steps.length = 0;
   autoplayEnabled = false;
-  distributeCards();
+  distributeCards(true);
   timeElapsed = 0;
   gameFinished = false;
   gameOverAnim.stop();
@@ -202,10 +196,6 @@ function gameOverAnimation() {
   gameOverAnim.start();
   clearInterval(timerInterval);
   timerInterval = undefined;
-  
-  setTimeout(() => {
-    showModal(false);
-  }, 2000);
 }
 
 function setupGameOverAnimation() {
@@ -263,13 +253,18 @@ function setupGameOverAnimation() {
 
   let cardAmount = 0;
   function createCard() {
-    // TODO Check Math Random for Animation Issue
     const number = ~~(Math.random() * 13);
     const sign = ~~(Math.random() * 4);
     let ay = 0;
-    ++cardAmount;
-
-    if (cardAmount > 10) restartGame(true);
+    
+    if (animRunning) {
+      ++cardAmount;
+      if (cardAmount > 10) {
+        gameOverAnim.stop();
+        showModal(false);
+        return;
+      }
+    }
 
     let running = true;
     let x = Math.random() * canvas.width;
@@ -439,15 +434,21 @@ const gameOverAnim = setupGameOverAnimation();
 
 createConts();
 restartGame(true);
-document.getElementById("game-over-canvas").onclick = () => restartGame(true);
+document.getElementById("game-over-canvas").onclick = () => {
+  gameOverAnim.stop();
+  showModal(false);
+};
 conts.stock.node.addEventListener("click", clickStock);
 //conts.stock.node.addEventListener('touchstart', clickStock)
 
 returnText.addEventListener('click', hideModal);
-randomGameBtn.addEventListener('click', () => restartGame(true));
+randomGameBtn.addEventListener('click', () => {
+  distributeCards(false);
+  hideModal();
+});
 winnableGameBtn.addEventListener('click', () => {
-  console.log('Winnable game to be implemented');
-  restartGame(true);
+  distributeCards(true);
+  hideModal();
 });
 
 function showModal(showReturn = true) {
