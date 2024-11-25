@@ -3,11 +3,20 @@ body {
   padding: 0;
   margin: 0;
   user-select: none;
+  width: 100%;
+  min-width: 100%;
+  overflow-x: hidden;
 }
 body {
   background-image: url(./assets/bg_tile.jpg);
   overscroll-behavior-y: none;
-  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-width: 100%;
+  min-height: 100vh;
+  background-color: #245324;
 }
 .ui {
   width: 100%;
@@ -167,32 +176,84 @@ body {
 }
 
 footer {
-  /* background: #325aaf; */
+  background: none;
   color: white;
+  width: 100vw;
+  padding: 1rem;
+  position: relative;
+  z-index: 1;
 }
+
 footer .container {
   display: flex;
-  justify-content: space-between;
-  padding: 0 10rem 0 10rem;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
-footer .container a {
-  text-decoration: none;
-  color: white;
-  cursor: pointer;
+
+/* Stack footer sections vertically on mobile */
+footer .container > div {
+  text-align: center;
 }
-footer .container a:hover {
-  text-decoration: underline;
+
+footer .container h3 {
+  font-size: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+footer .container p {
+  font-size: 1.125rem;
+  padding: 0.25rem 0;
+}
+
+/* Horizontal layout for larger screens */
+@media screen and (min-width: 768px) {
+  footer .container {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 3rem;
+    gap: 1rem;
+  }
+  
+  footer .container > div {
+    text-align: left;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  footer .container {
+    padding: 0 10rem;
+  }
 }
 
 /* Paula's CSS */
 
 .main {
+  width: 100%;
   background-color: white;
-  display: flex;
-  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.main-content {
+  width: min(1200px, 100vw);
+  position: relative;
   margin: 0 auto;
-  padding: 5rem 10rem;
-  align-items: center;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+@media screen and (min-width: 768px) {
+  .main-content {
+    padding: 2rem 3rem;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .main-content {
+    padding: 2rem 5rem;
+  }
 }
 
 .image {
@@ -201,21 +262,35 @@ footer .container a:hover {
 
 h1 {
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 2.5rem;
+  font-size: 1.8rem;
   font-weight: 900;
   text-transform: uppercase;
   margin: 0;
-  padding: 1rem 0 1rem;
-  /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
+  padding: 0.5rem 0;
+  text-align: center;
+}
+
+@media screen and (min-width: 768px) {
+  h1 {
+    font-size: 2.5rem;
+    padding: 1rem 0;
+  }
 }
 
 h2 {
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 2.125rem;
+  font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
-  padding: 1rem 0 1rem;
-  /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
+  padding: 0.5rem 0;
+  text-align: center;
+}
+
+@media screen and (min-width: 768px) {
+  h2 {
+    font-size: 2.125rem;
+    padding: 1rem 0;
+  }
 }
 
 h3 {
@@ -229,11 +304,18 @@ h3 {
 
 p {
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   font-weight: 300;
   margin: 0;
-  padding: 1rem 0 1rem;
-  /* Update the padding to how you see fit 1rem (top) 0 (sides) 1rem (bottom) */
+  padding: 0.5rem 0;
+  line-height: 1.5;
+}
+
+@media screen and (min-width: 768px) {
+  p {
+    font-size: 1.5rem;
+    padding: 1rem 0;
+  }
 }
 
 .modal {
@@ -314,4 +396,16 @@ p {
   .modal-buttons button {
     min-width: 180px;
   }
+}
+
+footer .container a {
+  color: white;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity 0.2s;
+}
+
+footer .container a:hover {
+  opacity: 1;
+  text-decoration: underline;
 }
