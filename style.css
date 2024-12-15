@@ -409,3 +409,32 @@ footer .container a:hover {
   opacity: 1;
   text-decoration: underline;
 }
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.features-list li {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.125rem;
+  padding: 0.5rem 0 0.5rem 1.5rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.features-list li:before {
+  content: "•";
+  color: #245324;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+@media screen and (min-width: 768px) {
+  .features-list li {
+    font-size: 1.5rem;
+    padding: 0.75rem 0 0.75rem 2rem;
+  }
+}
