@@ -5,6 +5,7 @@ const returnText = document.getElementById('return-text');
 const winnableGameBtn = document.getElementById('winnable-game');
 const randomGameBtn = document.getElementById('random-game');
 const generator = new SolitaireGenerator();
+const victoryLink = document.getElementById('victory-link');
 
 function createCards(winnable = true) {
   return generator.generateGame(winnable);
@@ -443,10 +444,26 @@ conts.stock.node.addEventListener("click", clickStock);
 
 returnText.addEventListener('click', hideModal);
 randomGameBtn.addEventListener('click', () => {
+  steps.length = 0;
+  autoplayEnabled = false;
+  timeElapsed = 0;
+  gameFinished = false;
+  gameOverAnim.stop();
+  
+  if (!timerInterval) timerInterval = setInterval(timer, 1000);
+  
   distributeCards(false);
   hideModal();
 });
 winnableGameBtn.addEventListener('click', () => {
+  steps.length = 0;
+  autoplayEnabled = false;
+  timeElapsed = 0;
+  gameFinished = false;
+  gameOverAnim.stop();
+  
+  if (!timerInterval) timerInterval = setInterval(timer, 1000);
+  
   distributeCards(true);
   hideModal();
 });
@@ -454,10 +471,18 @@ winnableGameBtn.addEventListener('click', () => {
 function showModal(showReturn = true) {
   modal.style.display = 'block';
   returnText.style.display = showReturn ? 'block' : 'none';
+  
+  // Show victory link only if game is won (showReturn is false when we win)
+  if (!showReturn && gameFinished) {
+    victoryLink.style.display = 'block';
+  } else {
+    victoryLink.style.display = 'none';
+  }
 }
 
 function hideModal() {
   modal.style.display = 'none';
+  victoryLink.style.display = 'none';
 }
 
 // Add click event listener to modal container

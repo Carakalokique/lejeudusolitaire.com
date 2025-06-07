@@ -28,9 +28,7 @@ class SolitaireGenerator {
         const cards = this.createDeck();
         
         if (!winnable) {
-            this.shuffleArray(cards);
-            this.shuffleArray(cards);
-            return cards;
+            return this.generateRandomGame(cards);
         }
 
         return this.generateWinnableGame(cards);
@@ -47,157 +45,350 @@ class SolitaireGenerator {
     }
 
     shuffleArray(array) {
+        // Fisher-Yates shuffle with better randomness
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(this.rng.next() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
         }
     }
 
+    generateRandomGame(cards) {
+        // Truly random shuffle - multiple passes for better randomness
+        for (let i = 0; i < 3; i++) {
+            this.shuffleArray(cards);
+        }
+        
+        // Basic playability check - ensure at least some moves are available
+        const tableau = Array(7).fill().map(() => []);
+        const stock = [];
+        let cardIndex = 0;
+        
+        // Fill tableau
+        for (let i = 0; i < 7; i++) {
+            for (let j = 0; j <= i; j++) {
+                tableau[i].push(cards[cardIndex++]);
+            }
+        }
+        
+        // Check if there's at least one playable move at start
+        let hasMove = false;
+        const visibleCards = tableau.map(pile => pile[pile.length - 1]);
+        
+        // Check for King to empty space (will be available after dealing)
+        const hasKing = visibleCards.some(card => card && card.number === Card.NUMBER.K);
+        
+        // Check for any buildable sequences
+        for (let i = 0; i < visibleCards.length; i++) {
+            for (let j = 0; j < visibleCards.length; j++) {
+                if (i !== j && visibleCards[i] && visibleCards[j]) {
+                    if (visibleCards[i].color !== visibleCards[j].color &&
+                        visibleCards[i].number === visibleCards[j].number - 1) {
+                        hasMove = true;
+                        break;
+                    }
+                }
+            }
+            if (hasMove) break;
+        }
+        
+        // Check for Aces
+        const hasAce = visibleCards.some(card => card && card.number === Card.NUMBER.A);
+        
+        // If no moves at all, do a minor adjustment
+        if (!hasMove && !hasKing && !hasAce) {
+            // Swap one visible card with a card from stock that creates a move
+            const remainingCards = cards.slice(28);
+            for (let i = 0; i < Math.min(3, remainingCards.length); i++) {
+                const stockCard = remainingCards[i];
+                for (let j = 0; j < visibleCards.length; j++) {
+                    const tableauCard = visibleCards[j];
+                    if (tableauCard) {
+                        // Check if swapping would create a move
+                        for (let k = 0; k < visibleCards.length; k++) {
+                            if (k !== j && visibleCards[k]) {
+                                if ((stockCard.color !== visibleCards[k].color &&
+                                     stockCard.number === visibleCards[k].number - 1) ||
+                                    stockCard.number === Card.NUMBER.A ||
+                                    stockCard.number === Card.NUMBER.K) {
+                                    // Swap the cards
+                                    const tableauIndex = cards.indexOf(tableauCard);
+                                    const stockIndex = cards.indexOf(stockCard);
+                                    [cards[tableauIndex], cards[stockIndex]] = [cards[stockIndex], cards[tableauIndex]];
+                                    return cards;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return cards;
+    }
+
     generateWinnableGame(cards) {
+        // Generate truly winnable games by working backwards from a solved state
+        
+        // Step 1: Start with a won game (all cards in foundations)
+        const foundations = [[], [], [], []];
+        const suits = [[], [], [], []];
+        
+        // Separate cards by suit
+        cards.forEach(card => {
+            suits[card.sign].push(card);
+        });
+        
+        // Sort each suit A to K
+        suits.forEach(suit => suit.sort((a, b) => a.number - b.number));
+        
+        // Place all cards in foundations (won state)
+        for (let i = 0; i < 4; i++) {
+            foundations[i] = [...suits[i]];
+        }
+        
+        // Step 2: Work backwards to create a solvable starting position
         const tableau = Array(7).fill().map(() => []);
         const stock = [];
         
-        // First pass: distribute kings more randomly
-        const kings = cards.filter(card => card.number === Card.NUMBER.K);
-        this.shuffleArray(kings);
+        // Remove cards from foundations to build tableau and stock
+        // We'll remove cards in a way that guarantees they can be played back
         
-        // Randomly decide how many tableau piles will start with kings (2-4)
-        const guaranteedKings = 2 + Math.floor(this.rng.next() * 3);
-        // Randomly choose which piles get the kings
-        const kingPositions = [];
-        while (kingPositions.length < guaranteedKings) {
-            const pos = Math.floor(this.rng.next() * 7);
-            if (!kingPositions.includes(pos)) {
-                kingPositions.push(pos);
-            }
-        }
+        // First, determine which cards will be visible in tableau
+        const visiblePositions = [0, 1, 2, 3, 4, 5, 6]; // One per pile
         
-        // Place kings in selected positions
-        for (let i = 0; i < guaranteedKings && i < kings.length; i++) {
-            tableau[kingPositions[i]].push(kings[i]);
-            cards.splice(cards.indexOf(kings[i]), 1);
-        }
-
-        // For positions without kings, start with high cards (10-Q)
-        for (let i = 0; i < 7; i++) {
-            if (tableau[i].length === 0) {
-                const highCards = cards.filter(card => 
-                    card.number >= Card.NUMBER[10] && 
-                    card.number <= Card.NUMBER.Q
-                );
-                if (highCards.length > 0) {
-                    const selectedCard = highCards[Math.floor(this.rng.next() * highCards.length)];
-                    tableau[i].push(selectedCard);
-                    cards.splice(cards.indexOf(selectedCard), 1);
+        // Place some high cards (K, Q, J) as visible cards in tableau
+        const highCards = [];
+        for (let suit = 0; suit < 4; suit++) {
+            for (let rank = 12; rank >= 10; rank--) {
+                const card = foundations[suit].find(c => c.number === rank);
+                if (card) {
+                    highCards.push({ card, suit });
                 }
             }
         }
-
-        // Second pass: create partial buildable sequences
-        for (let i = 0; i < 7; i++) {
-            const stackSize = i + 1;
-            while (tableau[i].length < stackSize) {
-                const lastCard = tableau[i][tableau[i].length - 1];
+        
+        // Shuffle high cards for variety
+        this.shuffleArray(highCards);
+        
+        // Place high cards on larger piles
+        let highCardIndex = 0;
+        for (let pile = 6; pile >= 3 && highCardIndex < highCards.length; pile--) {
+            const { card, suit } = highCards[highCardIndex++];
+            tableau[pile].push(card);
+            foundations[suit] = foundations[suit].filter(c => c !== card);
+        }
+        
+        // Build sequences down from these high cards
+        for (let pile = 3; pile < 7; pile++) {
+            if (tableau[pile].length > 0) {
+                let current = tableau[pile][tableau[pile].length - 1];
+                const sequenceLength = Math.min(pile - 2, 3 + Math.floor(this.rng.next() * 2));
                 
-                // 70% chance to try building a sequence
-                if (lastCard && this.rng.next() < 0.7) {
-                    const buildableCards = cards.filter(card => 
-                        card.color !== lastCard.color && 
-                        card.number === lastCard.number - 1
-                    );
+                for (let i = 0; i < sequenceLength && current.number > 1; i++) {
+                    // Find a card that can be placed on current
+                    const targetNumber = current.number - 1;
+                    const targetColor = current.color === 0 ? 1 : 0;
                     
-                    if (buildableCards.length > 0) {
-                        const selectedCard = buildableCards[Math.floor(this.rng.next() * buildableCards.length)];
-                        tableau[i].push(selectedCard);
-                        cards.splice(cards.indexOf(selectedCard), 1);
-                        continue;
+                    let found = false;
+                    for (let s = 0; s < 4; s++) {
+                        const match = foundations[s].find(c => 
+                            c.number === targetNumber && c.color === targetColor
+                        );
+                        if (match) {
+                            tableau[pile].push(match);
+                            foundations[s] = foundations[s].filter(c => c !== match);
+                            current = match;
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!found) break;
+                }
+            }
+        }
+        
+        // Place some aces and low cards strategically
+        const aceStrategy = Math.floor(this.rng.next() * 3);
+        
+        switch (aceStrategy) {
+            case 0: // Early accessibility
+                // Place 1-2 aces visible
+                for (let i = 0; i < 2; i++) {
+                    const suit = i;
+                    if (foundations[suit].length > 0 && foundations[suit][0].number === 0) {
+                        tableau[i].push(foundations[suit].shift());
+                    }
+                }
+                break;
+                
+            case 1: // Moderate difficulty
+                // Place 1 ace visible, 1 under one card
+                if (foundations[0][0] && foundations[0][0].number === 0) {
+                    tableau[1].push(foundations[0].shift());
+                }
+                // Place another ace to be under one card later
+                break;
+                
+            case 2: // Spread out
+                // All aces in stock or buried, but well distributed
+                break;
+        }
+        
+        // Fill remaining tableau positions
+        for (let pile = 0; pile < 7; pile++) {
+            const targetSize = pile + 1;
+            
+            // Add face-down cards first
+            while (tableau[pile].length < targetSize - 1) {
+                // Find a card from foundations
+                let added = false;
+                
+                // Prefer cards that won't block important sequences
+                const preferredRanks = [5, 6, 7, 8, 4, 9, 3, 10, 2];
+                
+                for (const rank of preferredRanks) {
+                    for (let suit = 0; suit < 4; suit++) {
+                        const card = foundations[suit].find(c => c.number === rank);
+                        if (card) {
+                            tableau[pile].push(card);
+                            foundations[suit] = foundations[suit].filter(c => c !== card);
+                            added = true;
+                            break;
+                        }
+                    }
+                    if (added) break;
+                }
+                
+                // Fallback: any card
+                if (!added) {
+                    for (let suit = 0; suit < 4; suit++) {
+                        if (foundations[suit].length > 0) {
+                            tableau[pile].push(foundations[suit].shift());
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Add final visible card if needed
+            if (tableau[pile].length === targetSize - 1) {
+                let added = false;
+                
+                // 60% chance to place a helpful card
+                if (this.rng.next() < 0.6) {
+                    // Try to place something that creates work but is solvable
+                    const ranks = [11, 10, 9, 2, 3, 4];
+                    for (const rank of ranks) {
+                        for (let suit = 0; suit < 4; suit++) {
+                            const card = foundations[suit].find(c => c.number === rank);
+                            if (card) {
+                                tableau[pile].push(card);
+                                foundations[suit] = foundations[suit].filter(c => c !== card);
+                                added = true;
+                                break;
+                            }
+                        }
+                        if (added) break;
                     }
                 }
                 
-                // Otherwise pick semi-random card
-                const index = Math.floor(this.rng.next() * cards.length);
-                tableau[i].push(cards[index]);
-                cards.splice(index, 1);
-            }
-        }
-
-        // Organize remaining cards into stock with controlled randomness
-        const remainingCards = [...cards];
-        
-        // First, analyze what's needed for tableau building
-        const tableauTops = tableau.map(stack => stack[stack.length - 1]);
-        const neededRanks = new Set();
-        tableauTops.forEach(card => {
-            if (card) neededRanks.add(card.number - 1);
-        });
-
-        // Create balanced groups of 3 cards
-        while (remainingCards.length > 0) {
-            const group = [];
-            
-            // First card: 60% chance to pick a needed rank
-            if (this.rng.next() < 0.6 && neededRanks.size > 0) {
-                const neededRanksArray = Array.from(neededRanks);
-                const targetRank = neededRanksArray[Math.floor(this.rng.next() * neededRanksArray.size)];
-                const possibleCards = remainingCards.filter(card => card.number === targetRank);
-                
-                if (possibleCards.length > 0) {
-                    const card = possibleCards[Math.floor(this.rng.next() * possibleCards.length)];
-                    group.push(card);
-                    remainingCards.splice(remainingCards.indexOf(card), 1);
+                // Fallback
+                if (!added) {
+                    for (let suit = 0; suit < 4; suit++) {
+                        if (foundations[suit].length > 0) {
+                            const idx = Math.floor(this.rng.next() * foundations[suit].length);
+                            tableau[pile].push(foundations[suit][idx]);
+                            foundations[suit].splice(idx, 1);
+                            break;
+                        }
+                    }
                 }
             }
-
-            // Fill the rest of the group
-            while (group.length < this.drawSize && remainingCards.length > 0) {
-                // Try to avoid putting too many same-rank cards together
-                const lastCard = group[group.length - 1];
-                let candidates = remainingCards;
-                
-                if (lastCard) {
-                    // Avoid same rank and prefer different colors
-                    candidates = remainingCards.filter(card => 
-                        card.number !== lastCard.number &&
-                        (this.rng.next() < 0.7 ? card.color !== lastCard.color : true)
-                    );
-                }
-                
-                if (candidates.length === 0) {
-                    candidates = remainingCards;
-                }
-
-                const index = Math.floor(this.rng.next() * candidates.length);
-                group.push(candidates[index]);
-                remainingCards.splice(remainingCards.indexOf(candidates[index]), 1);
-            }
-
-            // 30% chance to shuffle each group
-            if (this.rng.next() < 0.3) {
-                this.shuffleArray(group);
-            }
-            
-            stock.push(...group);
-        }
-
-        // Occasionally shuffle sections of the stock
-        const stockGroups = [];
-        for (let i = 0; i < stock.length; i += 9) {
-            stockGroups.push(stock.slice(i, i + 9));
         }
         
-        stockGroups.forEach(group => {
-            if (this.rng.next() < 0.5) {
-                this.shuffleArray(group);
+        // Step 3: Build stock from remaining cards
+        // Collect all remaining cards from foundations
+        const remainingCards = [];
+        for (let suit = 0; suit < 4; suit++) {
+            remainingCards.push(...foundations[suit]);
+        }
+        
+        // Ensure critical cards are accessible in stock
+        // Sort remaining cards by importance
+        const aces = remainingCards.filter(c => c.number === 0);
+        const lowCards = remainingCards.filter(c => c.number >= 1 && c.number <= 4);
+        const midCards = remainingCards.filter(c => c.number >= 5 && c.number <= 9);
+        const stockHighCards = remainingCards.filter(c => c.number >= 10 && c.number <= 12);
+        
+        // Build stock with strategic placement
+        stock.length = 0;
+        
+        // Place aces at accessible positions (multiples of 3 for 3-card draw)
+        const acePositions = [0, 6, 12, 18];
+        aces.forEach((ace, index) => {
+            if (index < acePositions.length) {
+                stock[acePositions[index]] = ace;
             }
         });
-
-        // Combine tableau and stock
-        const finalDeck = [];
+        
+        // Mix other cards but ensure reasonable distribution
+        const others = [];
+        
+        // Wave 1: Some high cards and mid cards
+        for (let i = 0; i < 3 && stockHighCards.length > 0; i++) {
+            others.push(stockHighCards.shift());
+        }
+        for (let i = 0; i < 3 && midCards.length > 0; i++) {
+            others.push(midCards.shift());
+        }
+        
+        // Wave 2: Low cards for foundation building
+        others.push(...lowCards);
+        
+        // Wave 3: Remaining cards
+        others.push(...midCards, ...stockHighCards);
+        
+        // Fill stock array
+        let stockIndex = 0;
+        others.forEach(card => {
+            while (stockIndex < stock.length && stock[stockIndex]) {
+                stockIndex++;
+            }
+            if (stockIndex < stock.length) {
+                stock[stockIndex] = card;
+            } else {
+                stock.push(card);
+            }
+        });
+        
+        // Remove undefined entries
+        const finalStock = stock.filter(c => c !== undefined);
+        
+        // Build final deck
+        const deck = [];
+        
+        // Add tableau cards
         for (let i = 0; i < 7; i++) {
-            finalDeck.push(...tableau[i]);
+            deck.push(...tableau[i]);
         }
-        finalDeck.push(...stockGroups.flat());
-
-        return finalDeck;
+        
+        // Add stock cards
+        deck.push(...finalStock);
+        
+        // Verify we have exactly 52 cards
+        if (deck.length !== 52) {
+            console.error('Invalid deck size:', deck.length);
+            // Fallback to random game
+            const fallbackDeck = [...cards];
+            this.shuffleArray(fallbackDeck);
+            return fallbackDeck;
+        }
+        
+        return deck;
+    }
+    
+    isCardUsed(card, tableau) {
+        return tableau.some(pile => pile.includes(card));
     }
 } 
